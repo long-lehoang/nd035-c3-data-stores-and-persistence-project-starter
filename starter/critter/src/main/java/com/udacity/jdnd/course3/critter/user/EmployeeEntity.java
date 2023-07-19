@@ -5,6 +5,7 @@ import com.udacity.jdnd.course3.critter.schedule.ScheduleEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import java.time.DayOfWeek;
@@ -16,6 +17,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "employees")
+@SuperBuilder
 public class EmployeeEntity extends BaseUserEntity {
     @ElementCollection
     @CollectionTable(name = "employee_skills", joinColumns = @JoinColumn(name = "employee_id"))

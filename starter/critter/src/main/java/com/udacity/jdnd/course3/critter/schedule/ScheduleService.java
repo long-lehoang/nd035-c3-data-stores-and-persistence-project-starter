@@ -23,17 +23,12 @@ public class ScheduleService {
     private final IPetRepository petRepository;
     private final IEmployeeRepository employeeRepository;
 
-    public ScheduleDTO save(ScheduleDTO scheduleDTO) {
+    public ScheduleEntity save(ScheduleEntity schedule) {
         // Get pets
-        List<PetEntity> petEntities = petRepository.findAllById(scheduleDTO.getPetIds());
+        List<PetEntity> petEntities = schedule.getPets();
         // Get Employees
-        List<EmployeeEntity> employeeEntities = employeeRepository.findAllById(scheduleDTO.getEmployeeIds());
+        List<EmployeeEntity> employeeEntities = schedule.getEmployees();
 
-        ScheduleEntity schedule = new ScheduleEntity();
-        schedule.setPets(petEntities);
-        schedule.setActivities(scheduleDTO.getActivities().stream().map(EmployeeSkill::toString).collect(Collectors.toList()));
-        schedule.setDate(scheduleDTO.getDate());
-        schedule.setEmployees(employeeEntities);
         ScheduleEntity savedSchedule = scheduleRepository.saveAndFlush(schedule);
 
         List<ScheduleEntity> scheduleEntities = new ArrayList<>();
@@ -59,10 +54,10 @@ public class ScheduleService {
         });
         employeeRepository.saveAll(employeeEntities);
 
-        return ScheduleMapper.INSTANCE.toDto(scheduleRepository.save(savedSchedule));
+        return scheduleRepository.save(savedSchedule);
     }
 
-    public List<ScheduleDTO> findAll() {
-        return scheduleRepository.findAll().stream().map(ScheduleMapper.INSTANCE::toDto).collect(Collectors.toList());
+    public List<ScheduleEntity> findAll() {
+        return scheduleRepository.findAll();
     }
 }

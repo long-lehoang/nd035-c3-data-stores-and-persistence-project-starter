@@ -6,6 +6,7 @@ import com.udacity.jdnd.course3.critter.user.CustomerEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -16,6 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "pets")
+@SuperBuilder
 public class PetEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private PetType type;

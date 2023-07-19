@@ -6,6 +6,7 @@ import com.udacity.jdnd.course3.critter.user.EmployeeEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -16,6 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "schedules")
+@SuperBuilder
 public class ScheduleEntity extends BaseEntity {
     private LocalDate date;
     @ManyToMany

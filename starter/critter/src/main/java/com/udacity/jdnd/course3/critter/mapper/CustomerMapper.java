@@ -4,11 +4,10 @@ import com.udacity.jdnd.course3.critter.common.BaseEntity;
 import com.udacity.jdnd.course3.critter.pet.PetEntity;
 import com.udacity.jdnd.course3.critter.user.CustomerDTO;
 import com.udacity.jdnd.course3.critter.user.CustomerEntity;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
+import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
+import java.lang.annotation.Inherited;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,4 +23,7 @@ public interface CustomerMapper {
 
     @Mapping(source = "pets", target = "petIds", qualifiedByName = "toPetIds")
     CustomerDTO toDto(CustomerEntity customerEntity);
+
+    @Mapping(target = "id", ignore = true)
+    CustomerEntity toEntity(CustomerDTO customerDTO);
 }

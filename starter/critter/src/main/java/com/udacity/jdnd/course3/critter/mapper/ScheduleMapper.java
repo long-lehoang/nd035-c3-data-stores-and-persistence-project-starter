@@ -31,4 +31,7 @@ public interface ScheduleMapper {
     @Mapping(source = "pets", target = "petIds", qualifiedByName = "toPetIds")
     @Mapping(source = "employees", target = "employeeIds", qualifiedByName = "toEmployeeIds")
     ScheduleDTO toDto(ScheduleEntity scheduleEntity);
+
+    @Mapping(target = "id", ignore = true)
+    ScheduleEntity toEntity(ScheduleDTO scheduleDTO);
 }

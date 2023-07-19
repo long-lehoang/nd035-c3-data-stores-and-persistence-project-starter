@@ -19,4 +19,7 @@ public interface PetMapper {
 
     @Mapping(source = "owner", target = "ownerId", qualifiedByName = "toOwnerId")
     PetDTO toDto(PetEntity petEntity);
+
+    @Mapping(target = "id", ignore = true)
+    PetEntity toEntity(PetDTO petDTO);
 }

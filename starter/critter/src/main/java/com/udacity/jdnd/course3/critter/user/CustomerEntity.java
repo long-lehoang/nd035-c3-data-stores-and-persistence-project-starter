@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
@@ -17,10 +18,10 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "customers")
-@Builder
+@SuperBuilder
 public class CustomerEntity extends BaseUserEntity {
     private String phoneNumber;
-
+    private String notes;
     @OneToMany(mappedBy = "owner")
     private List<PetEntity> pets;
 }

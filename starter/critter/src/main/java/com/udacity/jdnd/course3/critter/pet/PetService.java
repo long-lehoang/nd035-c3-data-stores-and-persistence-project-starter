@@ -1,8 +1,5 @@
 package com.udacity.jdnd.course3.critter.pet;
 
-import com.udacity.jdnd.course3.critter.mapper.PetMapper;
-import com.udacity.jdnd.course3.critter.mapper.ScheduleMapper;
-import com.udacity.jdnd.course3.critter.schedule.ScheduleDTO;
 import com.udacity.jdnd.course3.critter.schedule.ScheduleEntity;
 import com.udacity.jdnd.course3.critter.user.CustomerEntity;
 import com.udacity.jdnd.course3.critter.user.ICustomerRepository;
@@ -13,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -22,24 +18,16 @@ public class PetService {
     private final IPetRepository petRepository;
     private final ICustomerRepository customerRepository;
 
-    public PetDTO save(PetDTO petDTO) {
+    public PetEntity save(PetEntity petEntity) {
         //find customer
-        Optional<CustomerEntity> customerEntity = customerRepository.findById(petDTO.getOwnerId());
+        Optional<CustomerEntity> customerEntity = customerRepository.findById(petEntity.getOwner().getId());
 
         if (customerEntity.isEmpty()) {
-            return new PetDTO();
+            return null;
         }
 
-        //prepare pet entity
-        PetEntity petEntity = new PetEntity();
-        petEntity.setName(petDTO.getName());
-        petEntity.setType(petDTO.getType());
-        petEntity.setOwner(customerEntity.get());
-        petEntity.setNotes(petDTO.getNotes());
-        petEntity.setBirthDate(petDTO.getBirthDate());
-
-        //save
-        PetEntity savedEntity = petRepository.saveAndFlush(petEntity);
+        //save pet
+        PetEntity savedEntity = petRepository.save(petEntity);
 
         //update customer
         List<PetEntity> pets = customerEntity.get().getPets();
@@ -48,40 +36,37 @@ public class PetService {
         }
         pets.add(petEntity);
         customerEntity.get().setPets(pets);
-
         //save customer
-        customerRepository.saveAndFlush(customerEntity.get());
+        customerRepository.save(customerEntity.get());
 
-        //convert to dto
-        return PetMapper.INSTANCE.toDto(savedEntity);
+        return savedEntity;
     }
 
-    public PetDTO findById(long petId) {
-        Optional<PetEntity> entity = petRepository.findById(petId);
-
-        if (entity.isEmpty()) {
-            return null;
-        }
-
-        //convert to dto
-        return PetMapper.INSTANCE.toDto(entity.get());
+    public Optional<PetEntity> findById(long petId) {
+        return petRepository.findById(petId);
     }
 
-    public List<PetDTO> getAll() {
-        return petRepository.findAll().stream().map(PetMapper.INSTANCE::toDto).collect(Collectors.toList());
+    public List<PetEntity> getAll() {
+        return petRepository.findAll();
     }
 
-    public List<PetDTO> getByOwner(long ownerId) {
+    public List<PetEntity> getByOwner(long ownerId) {
         Optional<CustomerEntity> customerEntity = customerRepository.findById(ownerId);
         if (customerEntity.isEmpty()) {
             return new ArrayList<>();
         }
 
-        return customerEntity.get().getPets().stream().map(PetMapper.INSTANCE::toDto).collect(Collectors.toList());
+        return customerEntity.get().getPets();
     }
 
-    public List<ScheduleDTO> getSchedules(long petId) {
-        List<ScheduleEntity> scheduleEntities = petRepository.findById(petId).map(PetEntity::getSchedules).orElse(new ArrayList<>());
-        return scheduleEntities.stream().map(ScheduleMapper.INSTANCE::toDto).collect(Collectors.toList());
+    public List<ScheduleEntity> getSchedules(long petId) {
+        return petRepository.findById(petId).map(PetEntity::getSchedules).orElse(new ArrayList<>());
+    }
+
+    public List<PetEntity> findAllById(List<Long> petIds) {
+        if (petIds == null) {
+            return new ArrayList<>();
+        }
+        return petRepository.findAllById(petIds);
     }
 }

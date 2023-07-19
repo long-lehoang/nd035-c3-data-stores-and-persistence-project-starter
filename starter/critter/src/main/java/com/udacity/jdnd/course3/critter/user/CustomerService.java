@@ -1,10 +1,7 @@
 package com.udacity.jdnd.course3.critter.user;
 
-import com.udacity.jdnd.course3.critter.mapper.CustomerMapper;
-import com.udacity.jdnd.course3.critter.mapper.ScheduleMapper;
 import com.udacity.jdnd.course3.critter.pet.IPetRepository;
 import com.udacity.jdnd.course3.critter.pet.PetEntity;
-import com.udacity.jdnd.course3.critter.schedule.ScheduleDTO;
 import com.udacity.jdnd.course3.critter.schedule.ScheduleEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -21,26 +18,19 @@ public class CustomerService {
     private final ICustomerRepository customerRepository;
     private final IPetRepository petRepository;
 
-    public CustomerDTO save(CustomerDTO customerDTO) {
-        CustomerEntity entity = new CustomerEntity();
-        entity.setPhoneNumber(customerDTO.getPhoneNumber());
-        entity.setName(customerDTO.getName());
-
-        CustomerEntity saved = customerRepository.save(entity);
-
-        return CustomerMapper.INSTANCE.toDto(saved);
+    public CustomerEntity save(CustomerEntity entity) {
+        return customerRepository.save(entity);
     }
 
-    public List<CustomerDTO> getAll() {
-        List<CustomerEntity> list = customerRepository.findAll();
-        return list.stream().map(CustomerMapper.INSTANCE::toDto).collect(Collectors.toList());
+    public List<CustomerEntity> getAll() {
+        return customerRepository.findAll();
     }
 
-    public CustomerDTO getByPet(long petId) {
-        return petRepository.findById(petId).map(PetEntity::getOwner).map(CustomerMapper.INSTANCE::toDto).orElse(null);
+    public CustomerEntity getByPet(long petId) {
+        return petRepository.findById(petId).map(PetEntity::getOwner).orElse(null);
     }
 
-    public List<ScheduleDTO> getSchedules(long customerId) {
+    public List<ScheduleEntity> getSchedules(long customerId) {
         List<PetEntity> petEntities = customerRepository
                 .findById(customerId)
                 .map(CustomerEntity::getPets)
@@ -49,6 +39,10 @@ public class CustomerService {
         List<ScheduleEntity> scheduleEntities = new ArrayList<>();
         petEntities.forEach(petEntity -> scheduleEntities.addAll(petEntity.getSchedules()));
 
-        return scheduleEntities.stream().map(ScheduleMapper.INSTANCE::toDto).collect(Collectors.toList());
+        return scheduleEntities;
+    }
+
+    public Optional<CustomerEntity> findById(long ownerId) {
+        return customerRepository.findById(ownerId);
     }
 }

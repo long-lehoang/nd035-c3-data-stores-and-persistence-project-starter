@@ -1,8 +1,6 @@
 package com.udacity.jdnd.course3.critter.user;
 
 import com.udacity.jdnd.course3.critter.mapper.EmployeeMapper;
-import com.udacity.jdnd.course3.critter.mapper.ScheduleMapper;
-import com.udacity.jdnd.course3.critter.schedule.ScheduleDTO;
 import com.udacity.jdnd.course3.critter.schedule.ScheduleEntity;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,19 +16,12 @@ import java.util.stream.Collectors;
 public class EmployeeService {
     private final IEmployeeRepository employeeRepository;
 
-    public EmployeeDTO save(EmployeeDTO employeeDTO) {
-        EmployeeEntity entity = new EmployeeEntity();
-        entity.setName(employeeDTO.getName());
-        entity.setSkills(employeeDTO.getSkills().stream().map(Enum::toString).collect(Collectors.toList()));
-        entity.setDaysAvailable(employeeDTO.getDaysAvailable());
-        EmployeeEntity saved = employeeRepository.save(entity);
-
-        return EmployeeMapper.INSTANCE.toDto(saved);
+    public EmployeeEntity save(EmployeeEntity entity) {
+        return employeeRepository.save(entity);
     }
 
-    public EmployeeDTO findById(long employeeId) {
-        Optional<EmployeeEntity> employeeEntity = employeeRepository.findById(employeeId);
-        return employeeEntity.map(EmployeeMapper.INSTANCE::toDto).orElse(null);
+    public Optional<EmployeeEntity> findById(long employeeId) {
+        return employeeRepository.findById(employeeId);
     }
 
     public void setAvailability(Set<DayOfWeek> daysAvailable, long employeeId) {
@@ -41,7 +32,7 @@ public class EmployeeService {
         });
     }
 
-    public List<EmployeeDTO> getAvailables(EmployeeRequestDTO employeeDTO) {
+    public List<EmployeeEntity> getAvailables(EmployeeRequestDTO employeeDTO) {
         // Get available employee by skill
         List<EmployeeEntity> employees = employeeRepository.findAll(); // List of all employees
         List<String> searchSkills = employeeDTO.getSkills() // List of skills to search
@@ -55,19 +46,20 @@ public class EmployeeService {
                 .collect(Collectors.toList());
 
         // Filter available employee by schedule
-        List<EmployeeEntity> matchingAvailableEmployees = matchingSkillEmployees
+        return matchingSkillEmployees
                 .stream()
                 .filter(employee -> new HashSet<>(employee.getDaysAvailable()).contains(employeeDTO.getDate().getDayOfWeek()))
                 .collect(Collectors.toList());
-
-        return matchingAvailableEmployees.stream().map(EmployeeMapper.INSTANCE::toDto).collect(Collectors.toList());
     }
 
-    public List<ScheduleDTO> getSchedules(long employeeId) {
-        List<ScheduleEntity> scheduleEntities = employeeRepository
+    public List<ScheduleEntity> getSchedules(long employeeId) {
+        return employeeRepository
                 .findById(employeeId)
                 .map(EmployeeEntity::getSchedules)
                 .orElse(new ArrayList<>());
-        return scheduleEntities.stream().map(ScheduleMapper.INSTANCE::toDto).collect(Collectors.toList());
+    }
+
+    public List<EmployeeEntity> findAllById(List<Long> employeeIds) {
+        return employeeRepository.findAllById(employeeIds);
     }
 }
